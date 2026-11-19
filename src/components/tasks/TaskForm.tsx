@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { Task, TaskFormData, TaskStatus, TaskPriority } from '../../core/types';
 import { X, Plus, Save } from 'lucide-react';
 
@@ -15,33 +15,17 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   onCancel,
   isOpen,
 }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<TaskStatus>('todo');
-  const [priority, setPriority] = useState<TaskPriority>('medium');
-  const [dueDate, setDueDate] = useState('');
-  const [tagInput, setTagInput] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-  const [error, setError] = useState('');
+const [title, setTitle] = useState(initialData?.title ?? '');
+const [description, setDescription] = useState(initialData?.description ?? '');
+const [status, setStatus] = useState<TaskStatus>(initialData?.status ?? 'todo');
+const [priority, setPriority] = useState<TaskPriority>(initialData?.priority ?? 'medium');
+const [dueDate, setDueDate] = useState(initialData?.dueDate ?? '');
+const [tagInput, setTagInput] = useState('');
+const [tags, setTags] = useState<string[]>(
+  initialData?.tags ? [...initialData.tags] : []
+);
+const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (initialData) {
-      setTitle(initialData.title || '');
-      setDescription(initialData.description || '');
-      setStatus(initialData.status || 'todo');
-      setPriority(initialData.priority || 'medium');
-      setDueDate(initialData.dueDate || '');
-      setTags(initialData.tags ? [...initialData.tags] : []);
-    } else {
-      setTitle('');
-      setDescription('');
-      setStatus('todo');
-      setPriority('medium');
-      setDueDate('');
-      setTags([]);
-    }
-    setError('');
-  }, [initialData, isOpen]);
 
   if (!isOpen) return null;
 

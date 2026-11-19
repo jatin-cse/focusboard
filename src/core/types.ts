@@ -23,14 +23,6 @@ export interface TaskFormData {
   tags: string[];
 }
 
-export const TaskStatusEnum = [
-  'todo',
-  'in_progress',
-  'completed',
-] as const;
+export const TaskStatusEnum = ['todo', 'in_progress', 'completed'] as const;
 
-export const TaskPriorityEnum = [
-  'low',
-  'medium',
-  'high',
-] as const;
+export const TaskPriorityEnum = ['low', 'medium', 'high'] as const;

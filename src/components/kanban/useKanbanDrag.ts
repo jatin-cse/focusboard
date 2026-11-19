@@ -1,49 +1,53 @@
-import { useState, useCallback } from 'react'
-import type { TaskStatus } from '../../types/task'
+import { useState, useCallback } from 'react';
+import type { DragEvent } from 'react';
+import type { TaskStatus } from '../../core/types';
 
-export function useKanbanDrag(onMoveTask: (taskId: string, targetStatus: TaskStatus) => void) {
-  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null)
-  const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null)
+export function useKanbanDrag(
+  onMoveTask: (taskId: string, targetStatus: TaskStatus) => void
+) {
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+  const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
 
-  const handleDragStart = useCallback((e: React.DragEvent, taskId: string) => {
-    setDraggedTaskId(taskId)
-    e.dataTransfer.setData('text/plain', taskId)
-    e.dataTransfer.effectAllowed = 'move'
-  }, [])
+  const handleDragStart = useCallback((e: DragEvent, taskId: string) => {
+    setDraggedTaskId(taskId);
+    e.dataTransfer.setData('text/plain', taskId);
+    e.dataTransfer.effectAllowed = 'move';
+  }, []);
 
-  const handleDragOver = useCallback((e: React.DragEvent, columnStatus: TaskStatus) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-    if (dragOverColumn !== columnStatus) {
-      setDragOverColumn(columnStatus)
-    }
-  }, [dragOverColumn])
+  const handleDragOver = useCallback((e: DragEvent, status: TaskStatus) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverColumn(status);
+  }, []);
 
-  const handleDragLeave = useCallback((e: React.DragEvent, columnStatus: TaskStatus) => {
-    e.preventDefault()
-    // Only clear if leaving the column itself, not entering a child element
-    const relatedTarget = e.relatedTarget as HTMLElement | null
+  const handleDragLeave = useCallback((e: DragEvent, status: TaskStatus) => {
+    const relatedTarget = e.relatedTarget as Node | null;
+
     if (!relatedTarget || !e.currentTarget.contains(relatedTarget)) {
-      if (dragOverColumn === columnStatus) {
-        setDragOverColumn(null)
-      }
+      setDragOverColumn(current => current === status ? null : current);
     }
-  }, [dragOverColumn])
+  }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent, targetStatus: TaskStatus) => {
-    e.preventDefault()
-    setDragOverColumn(null)
-    const taskId = e.dataTransfer.getData('text/plain') || draggedTaskId
+  const handleDrop = useCallback((
+    e: DragEvent,
+    targetStatus: TaskStatus
+  ) => {
+    e.preventDefault();
+
+    const taskId = e.dataTransfer.getData('text/plain') || draggedTaskId;
+
     if (taskId) {
-      onMoveTask(taskId, targetStatus)
+      onMoveTask(taskId, targetStatus);
     }
-    setDraggedTaskId(null)
-  }, [draggedTaskId, onMoveTask])
+
+    setDraggedTaskId(null);
+    setDragOverColumn(null);
+  }, [draggedTaskId, onMoveTask]);
 
   const handleDragEnd = useCallback(() => {
-    setDraggedTaskId(null)
-    setDragOverColumn(null)
-  }, [])
+    setDraggedTaskId(null);
+    setDragOverColumn(null);
+  }, []);
 
   return {
     draggedTaskId,
@@ -53,5 +57,5 @@ export function useKanbanDrag(onMoveTask: (taskId: string, targetStatus: TaskSta
     handleDragLeave,
     handleDrop,
     handleDragEnd,
-  }
+  };
 }
